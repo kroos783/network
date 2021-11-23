@@ -1,0 +1,25 @@
+{% extends "network/layout.html" %}
+{% load static %}
+
+{% block body %}
+{% if user.is_authenticated %}
+<div id="compose-view">
+    <h3>New Post</h3>
+    <form id="compose-form">
+        {% csrf_token %}
+        <div class="form-group">
+            From: <input disabled class="form-control" id="compose-user" value="{{ request.user.username }}">
+        </div>
+        <textarea class="form-control" id="compose-body" placeholder="Body"></textarea>
+        <input type="submit" class="btn btn-primary"/>
+    </form>
+</div>
+{% endif %}
+<div id="posts_view">
+
+</div>
+{% endblock %}
+{% block script %}
+<script src="{% static 'network/main.js' %}"></script>
+<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js" type="text/javascript"></script>
+{% endblock %}
