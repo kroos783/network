@@ -10,5 +10,6 @@ urlpatterns = [
     path("register", views.register, name="register"),
     
     # API Routes
-    path("posts", views.show_posts, name="show_post")
+    path("posts", views.submit_post, name="submit_post"),
+    path("posts/<str:postbox>", views.show_posts, name="show_post")
 ]

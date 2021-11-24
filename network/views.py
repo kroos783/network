@@ -12,30 +12,46 @@ from .models import *
 def index(request):
     return render(request, "network/index.html")
 
-def show_posts(request):
+
+def show_posts(request, postbox):
+    # If post method
     if request.method == "POST":
-        print("request is post")
-        data = json.loads(request.body)
-        body = data.get("body", "")
-        print(body)
-        user = data.get("user", "")
-        print(user)
-        username = User.objects.get(username=user)
-        if body == [""]:
-            return JsonResponse({
-                "error": "Body of post is empty."
-            })
-        post = Post(
-            user=username,
-            body=body
+        submit_post(request)
+    
+    # If get method
+    # Check "postbox"
+    if postbox == "show_posts":    
+        posts = Post.objects.filter(
+            archived=False
         )
-        post.save()
-        return JsonResponse({"message": "Post sent successfully."}, status=201)
-    posts = Post.objects.filter(
-        archived=False
-    )
+    if postbox == "PostFollowing":
+        posts = Post.objects.filter(
+            archived=False
+        )
+    else:
+        JsonResponse({"error": "Invalid postbox"}, status=400)
     posts = posts.order_by("-timestamp").all()
     return JsonResponse([post.serialize() for post in posts], safe=False)
+
+
+def submit_post(request):
+    print("request is post")
+    data = json.loads(request.body)
+    body = data.get("body", "")
+    print(body)
+    user = data.get("user", "")
+    print(user)
+    username = User.objects.get(username=user)
+    if body == [""]:
+        return JsonResponse({
+            "error": "Body of post is empty."
+        })
+    post = Post(
+        user=username,
+        body=body
+    )
+    post.save()
+    return JsonResponse({"message": "Post sent successfully."}, status=201)
 
 
 def login_view(request):

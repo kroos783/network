@@ -2,15 +2,16 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // Use buttons to toggle between views
     //document.querySelector('#allposts').addEventListener('click', () => load_posts('allposts'));
+    document.querySelector('#allposts').addEventListener('click', () => load_posts('show_posts'));
     document.querySelector('#compose-form').addEventListener('submit', submit_post);
   
     // By default, load the inbox
-    load_posts('allposts');
+    load_posts('show_posts');
   });
 
-function load_posts(request) {
+function load_posts(posts) {
 
-    fetch('/posts/')
+    fetch('/posts/' + posts)
         .then(response => response.json())
         .then(posts => {
             let posts_view = document.querySelector("#posts_view");
@@ -57,7 +58,7 @@ function submit_post(event) {
     .then(response => response.json())
     .then(result => { 
       console.log(result);
-      load_posts('allposts');
+      load_posts('show_posts');
     })
   }
 

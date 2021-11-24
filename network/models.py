@@ -20,7 +20,7 @@ class Post(models.Model):
         return {
             "id": self.id,
             "body": self.body,
-            "user": self.user,
+            "user": self.user.username,
             "timestamp": self.timestamp.strftime("%b %d %Y, %I:%M %p")
         }
         
