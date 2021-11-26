@@ -2,7 +2,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // Use buttons to toggle between views
     //document.querySelector('#allposts').addEventListener('click', () => load_posts('allposts'));
-    document.querySelector('#allposts').addEventListener('click', () => load_posts('show_posts'));
+    //document.querySelector('#allposts').addEventListener('click', () => load_posts('show_posts'));
     document.querySelector('#compose-form').addEventListener('submit', submit_post);
   
     // By default, load the inbox

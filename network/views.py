@@ -42,7 +42,7 @@ def submit_post(request):
     user = data.get("user", "")
     print(user)
     username = User.objects.get(username=user)
-    if body == [""]:
+    if not body:
         return JsonResponse({
             "error": "Body of post is empty."
         })
