@@ -11,6 +11,8 @@ document.addEventListener('DOMContentLoaded', function() {
 
 function load_posts(posts) {
 
+    document.querySelector("#posts_view").innerHTML = "";
+
     fetch('/posts/' + posts)
         .then(response => response.json())
         .then(posts => {
@@ -40,7 +42,7 @@ function submit_post(event) {
     var csrftoken = getCookie('csrftoken');
 
     // Send data to db server
-    fetch('/posts', {
+    fetch('/posts/submit', {
       credentials: 'include',
       method: "POST",
       mode: 'same-origin',
@@ -60,6 +62,7 @@ function submit_post(event) {
       console.log(result);
       load_posts('show_posts');
     })
+    
   }
 
   function getCookie(name) {

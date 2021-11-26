@@ -13,18 +13,22 @@ def index(request):
     return render(request, "network/index.html")
 
 
+def following(request):
+    return render(request, "network/following.html")
+
+
 def show_posts(request, postbox):
     # If post method
     if request.method == "POST":
         submit_post(request)
-    
+
     # If get method
     # Check "postbox"
-    if postbox == "show_posts":    
+    if postbox == "show_posts":
         posts = Post.objects.filter(
             archived=False
         )
-    if postbox == "PostFollowing":
+    if postbox == "following":
         posts = Post.objects.filter(
             archived=False
         )
@@ -104,4 +108,3 @@ def register(request):
         return HttpResponseRedirect(reverse("index"))
     else:
         return render(request, "network/register.html")
-
