@@ -1,0 +1,22 @@
+{% extends "network/layout.html" %} 
+{% load static %} 
+{% block body %} 
+<h3>User : {{ user.username }}</h3>
+member since : {{ user.date_joined }}
+
+Follower : {{ follower }}
+Followed : {{ followed }}
+
+{% if user.is_authenticated %}
+
+{% endif %}
+{% for post in posts %}
+<div id="posts_view">
+    <div class="owner col-3"> From : <a href="{% url 'userPage' post.user %}"><strong>{{post.user}}</strong></a></div>
+    <div class="body col-5"> Message : <strong>{{post.body}}</strong></div>
+    <div class="timestamp col-3">{{post.timestamp}}</div>
+</div>
+{% endfor %}
+{% endblock %} {% block script %}
+
+{% endblock %}

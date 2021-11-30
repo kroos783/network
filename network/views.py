@@ -13,8 +13,23 @@ def index(request):
     return render(request, "network/index.html")
 
 
+@login_required
 def following(request):
     return render(request, "network/following.html")
+
+
+def userPage(request, username):
+    user = User.objects.get(username=username)
+    posts = Post.objects.filter(user=user)
+    followed = FollowUser.objects.filter(followed=user).count()
+    follower = FollowUser.objects.filter(follower=user).count()
+    print(user)
+    return render(request, "network/user.html", {
+        "user": user,
+        "posts": posts,
+        "followed": followed,
+        "follower": follower
+    })
 
 
 def show_posts(request, postbox):
@@ -38,6 +53,7 @@ def show_posts(request, postbox):
     return JsonResponse([post.serialize() for post in posts], safe=False)
 
 
+@login_required
 def submit_post(request):
     print("request is post")
     data = json.loads(request.body)
