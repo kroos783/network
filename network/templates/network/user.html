@@ -8,6 +8,10 @@ Follower : {{ follower }}
 Followed : {{ followed }}
 
 {% if user.is_authenticated %}
+<div id="followunfollow">
+
+</div>
+{% else %}
 
 {% endif %}
 {% for post in posts %}

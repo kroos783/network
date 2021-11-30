@@ -44,8 +44,11 @@ def show_posts(request, postbox):
             archived=False
         )
     if postbox == "following":
+        #user = User.objects.get(username=request.user)
+        #following = user.UserFollowed.get(follower=user)
         posts = Post.objects.filter(
-            archived=False
+            archived=False,
+            # user=following
         )
     else:
         JsonResponse({"error": "Invalid postbox"}, status=400)
