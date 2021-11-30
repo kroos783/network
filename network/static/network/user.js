@@ -6,17 +6,26 @@ document.addEventListener('DOMContentLoaded', function() {
     //document.querySelector('#compose-form').addEventListener('submit', submit_post);
   
     // By default, load the inbox
-    load_posts('userPage');
+    //load_posts('userPage');
   });
 
 
-function followFunction(id, mailbox) {
+function followFunction(id) {
 
     let followunfollow = document.querySelector('#followunfollow');
     followunfollow.innerHTML = '';
 
+    let FollowButton = document.createElement('btn');
+    FollowButton.className = 'btn btn btn-primary m-3 ml-4';
+    if (email.archived)
+        archiveButton.innerHTML = 'unarchive';
+    else
+        archiveButton.innerHTML = 'Archive';
 
-    fetch('/')
+
+    fetch('/follow/' + id)
+    .then(response => response.json())
+    .then(follow)
 }
 
 
