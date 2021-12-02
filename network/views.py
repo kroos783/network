@@ -1,4 +1,5 @@
 import json
+from django.core import serializers
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
 from django.db import IntegrityError
@@ -18,17 +19,59 @@ def following(request):
     return render(request, "network/following.html")
 
 
+def follow(request, userID):
+    followedUser = User.objects.get(username=userID)
+    followerUser = User.objects.get(username=request.user)
+
+    if not FollowUser.objects.filter(
+            follower=followerUser, followed=followedUser).exists():
+        follow = FollowUser.objects.create(
+            follower=followerUser, followed=followedUser, follow=True)
+        follow.save()
+        print("save done")
+        followerCount = FollowUser.objects.filter(
+            followed=followedUser)
+        return JsonResponse(serializers.serialize('json', [followerCount]), safe=False)
+
+    follow = FollowUser.objects.get(
+        follower=followerUser, followed=followedUser)
+    print(follow.follow)
+    if follow.follow == True:
+        follow.follow = False
+    else:
+        print(follow.follow)
+        follow.follow = True
+    follow.save()
+    followersCount = FollowUser.objects.filter(
+        followed=followedUser, follow=True)
+    print(followersCount)
+    return JsonResponse([followerCount.serialize() for followerCount in followersCount], safe=False)
+
+
 def userPage(request, username):
     user = User.objects.get(username=username)
     posts = Post.objects.filter(user=user)
-    followed = FollowUser.objects.filter(followed=user).count()
+    followed = FollowUser.objects.filter(followed=user, follow=True).count()
     follower = FollowUser.objects.filter(follower=user).count()
+    if not request.user.is_authenticated:
+        return render(request, "network/user.html", {
+            "user": user,
+            "posts": posts,
+            "followed": followed,
+            "follower": follower
+        })
+    owner = User.objects.get(username=request.user)
+    try:
+        follow = FollowUser.objects.get(follower=owner, followed=user)
+    except:
+        follow = FollowUser.DoesNotExist
     print(user)
     return render(request, "network/user.html", {
         "user": user,
         "posts": posts,
         "followed": followed,
-        "follower": follower
+        "follower": follower,
+        "follow": follow
     })
 
 
@@ -44,8 +87,8 @@ def show_posts(request, postbox):
             archived=False
         )
     if postbox == "following":
-        #user = User.objects.get(username=request.user)
-        #following = user.UserFollowed.get(follower=user)
+        # user = User.objects.get(username=request.user)
+        # following = user.UserFollowed.get(follower=user)
         posts = Post.objects.filter(
             archived=False,
             # user=following

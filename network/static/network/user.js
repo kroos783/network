@@ -12,20 +12,26 @@ document.addEventListener('DOMContentLoaded', function() {
 
 function followFunction(id) {
 
-    let followunfollow = document.querySelector('#followunfollow');
-    followunfollow.innerHTML = '';
-
-    let FollowButton = document.createElement('btn');
-    FollowButton.className = 'btn btn btn-primary m-3 ml-4';
-    if (email.archived)
-        archiveButton.innerHTML = 'unarchive';
-    else
-        archiveButton.innerHTML = 'Archive';
+    let FollowButton = document.querySelector("#buttonFollow");
 
 
     fetch('/follow/' + id)
     .then(response => response.json())
-    .then(follow)
+    .then(follow => {
+                
+        if (FollowButton.innerHTML === 'Follow')
+            FollowButton.innerHTML = 'Unfollow';
+        else
+            FollowButton.innerHTML = 'Follow';
+
+        console.log(follow)
+        let followScore = JSON.parse(follow.follow == True)
+        let followedScore = document.querySelector("#followed");
+
+        followedScore.innerHTML = `Followed : ${followScore}`;
+
+
+    })
 }
 
 

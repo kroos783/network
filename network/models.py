@@ -69,6 +69,7 @@ class FollowUser(models.Model):
         User, on_delete=models.CASCADE, related_name="UserFollower")
     followed = models.ForeignKey(
         User, on_delete=models.CASCADE, related_name="UserFollowed")
+    follow = models.BooleanField(default=False)
     timestamp = models.DateTimeField(auto_now_add=True)
 
     def serialize(self):
@@ -76,5 +77,6 @@ class FollowUser(models.Model):
             "id": self.id,
             "follower": self.follower,
             "followed": self.followed,
+            "follow": self.follow,
             "timestamp": self.timestamp.strftime("%b %d %Y, %I:%M %p")
         }
