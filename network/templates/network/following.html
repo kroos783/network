@@ -4,9 +4,76 @@
 
   <h3>Following :</h3>
 
-<div id="posts_view">
-  <h3></h3>
-</div>
+  {% for post in posts %}
+  <div id="posts_view">
+    <div class="owner col-3"> From : <a href="{% url 'userPage' post.user %}"><strong>{{post.user}}</strong></a></div>
+    <div class="body col-5"> Message : <strong>{{post.body}}</strong></div>
+    <div class="timestamp col-3">{{post.timestamp}}</div>
+  </div>
+  {% endfor %}
+  
+  <div>
+  
+    <nav aria-label="Page navigation example">
+      <ul class="pagination step-links">
+        {% if posts.has_previous %}
+          <li class="page-item">
+            <a class="page-link" href="?page=1" aria-label="First">
+              <span aria-hidden="true">&laquo; First</span>
+            </a>
+          </li>
+          <li class="page-item">
+            <a class="page-link" href="?page={{ posts.previous_page_number }}" aria-label="Previous">
+              <span aria-hidden="true">&laquo;</span>
+            </a>
+          </li>
+        {% else %}
+          <li class="page-item disabled">
+            <a class="page-link" href="#" aria-label="First">
+              <span aria-hidden="true">&laquo; First</span>
+            </a>
+          </li>
+          <li class="page-item disabled">
+            <a class="page-link" href="#" aria-label="Previous">
+              <span aria-hidden="true">&laquo;</span>
+            </a>
+          </li>
+        {% endif %}
+  
+        
+        <span class="current">
+          Page {{ posts.number }} of {{ posts.paginator.num_pages }}.
+        </span>
+        
+  
+        {% if posts.has_next %}
+        <li class="page-item">
+          <a class="page-link" href="?page={{ posts.next_page_number }}" aria-label="Next">
+            <span aria-hidden="true">&raquo;</span>
+          </a>
+        </li>
+        <li class="page-item">
+          <a class="page-link" href="?page={{ posts.paginator.num_pages }}" aria-label="Last">
+            <span aria-hidden="true">Last &raquo;</span>
+          </a>
+        </li>
+        {% else %}
+        <li  class="page-item disabled">
+          <a class="page-link" href="#" aria-label="Next">
+            <span aria-hidden="true">&raquo;</span>
+          </a>
+        </li>
+        <li  class="page-item disabled">
+          <a class="page-link" href="#" aria-label="Last">
+            <span aria-hidden="true">Last &raquo;</span>
+          </a>
+        </li>
+        {% endif %}
+      </ul>
+    </nav>
+  
+  </div>
+
 {% endblock %} {% block script %}
 <script src="{% static 'network/following.js' %}"></script>
 <script

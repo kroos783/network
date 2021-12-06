@@ -24,12 +24,10 @@ function followFunction(id) {
         else
             FollowButton.innerHTML = 'Follow';
 
-        console.log(follow)
-        let followScore = JSON.parse(follow.follow == True)
+        let followScore = JSON.parse(follow.follower_count)
         let followedScore = document.querySelector("#followed");
 
         followedScore.innerHTML = `Followed : ${followScore}`;
-
 
     })
 }

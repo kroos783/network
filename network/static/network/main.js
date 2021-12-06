@@ -6,7 +6,7 @@ document.addEventListener('DOMContentLoaded', function() {
     document.querySelector('#compose-form').addEventListener('submit', submit_post);
   
     // By default, load the inbox
-    load_posts('show_posts');
+    //load_posts('show_posts');
   });
 
 function load_posts(posts) {

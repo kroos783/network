@@ -6,17 +6,38 @@ from django.db import IntegrityError
 from django.http import JsonResponse, HttpResponse, HttpResponseRedirect
 from django.shortcuts import render
 from django.urls import reverse
+from django.core.paginator import Paginator
 
 from .models import *
 
 
 def index(request):
-    return render(request, "network/index.html")
+    posts = Post.objects.filter(
+        archived=False
+    )
+    posts = posts.order_by("-timestamp").all()
+    liked = LikePost.objects.filter(post__in=posts, like=True).exists()
+    print(liked)
+    paginator = Paginator(posts, 10)
+    page_number = request.GET.get('page')
+    page_obj = paginator.get_page(page_number)
+    return render(request, "network/index.html", {'posts': page_obj, 'liked': liked})
 
 
 @login_required
 def following(request):
-    return render(request, "network/following.html")
+    user = User.objects.get(username=request.user.username)
+    following = FollowUser.objects.filter(
+        follower=user, follow=True).values_list('followed', flat=True)
+    posts = Post.objects.filter(
+        archived=False,
+        user__in=following
+    )
+    posts = posts.order_by("-timestamp").all()
+    paginator = Paginator(posts, 10)
+    page_number = request.GET.get('page')
+    page_obj = paginator.get_page(page_number)
+    return render(request, "network/following.html", {"posts": page_obj})
 
 
 def follow(request, userID):
@@ -45,7 +66,7 @@ def follow(request, userID):
     followersCount = FollowUser.objects.filter(
         followed=followedUser, follow=True)
     print(followersCount)
-    return JsonResponse([followerCount.serialize() for followerCount in followersCount], safe=False)
+    return JsonResponse({'status': 201, "follower_count": followersCount.count()}, status=201)
 
 
 def userPage(request, username):
@@ -53,10 +74,14 @@ def userPage(request, username):
     posts = Post.objects.filter(user=user)
     followed = FollowUser.objects.filter(followed=user, follow=True).count()
     follower = FollowUser.objects.filter(follower=user).count()
+    posts = posts.order_by("-timestamp").all()
+    paginator = Paginator(posts, 10)
+    page_number = request.GET.get('page')
+    page_obj = paginator.get_page(page_number)
     if not request.user.is_authenticated:
         return render(request, "network/user.html", {
             "user": user,
-            "posts": posts,
+            "posts": page_obj,
             "followed": followed,
             "follower": follower
         })
@@ -68,7 +93,7 @@ def userPage(request, username):
     print(user)
     return render(request, "network/user.html", {
         "user": user,
-        "posts": posts,
+        "posts": page_obj,
         "followed": followed,
         "follower": follower,
         "follow": follow
@@ -86,17 +111,32 @@ def show_posts(request, postbox):
         posts = Post.objects.filter(
             archived=False
         )
+
     if postbox == "following":
-        # user = User.objects.get(username=request.user)
-        # following = user.UserFollowed.get(follower=user)
+        user = User.objects.get(username=request.user.username)
+        following = FollowUser.objects.filter(
+            follower=user, follow=True).values_list('followed', flat=True)
+        print(following)
+        print(following)
+        print("ok")
         posts = Post.objects.filter(
             archived=False,
-            # user=following
+            user__in=following
         )
+        print(posts)
     else:
-        JsonResponse({"error": "Invalid postbox"}, status=400)
+        return HttpResponse(request, {"error": "Invalid postbox"}, status=400)
+
     posts = posts.order_by("-timestamp").all()
-    return JsonResponse([post.serialize() for post in posts], safe=False)
+    paginator = Paginator(posts, 10)
+    if request.GET.get("page") != None:
+        try:
+            posts = paginator.page(request.GET.get("page"))
+        except:
+            posts = paginator.page(1)
+    else:
+        posts = paginator.page(1)
+    return render(request, 'network/{{postbox}}.html', {'posts': posts})
 
 
 @login_required
@@ -170,3 +210,33 @@ def register(request):
         return HttpResponseRedirect(reverse("index"))
     else:
         return render(request, "network/register.html")
+
+
+@login_required
+def like(request, postID):
+    likededPost = Post.objects.get(id=postID)
+    LikeUser = User.objects.get(username=request.user)
+
+    if not LikePost.objects.filter(
+            user=LikeUser, post=likededPost).exists():
+        like = LikePost.objects.create(
+            user=LikeUser, post=likededPost, like=True)
+        like.save()
+        print("save done")
+        likeCount = LikePost.objects.filter(
+            post=likededPost, like=True)
+        return JsonResponse({'status': 201, "like_count": likeCount.count()}, status=201)
+
+    like = LikePost.objects.get(
+        user=LikeUser, post=likededPost)
+    print(like.like)
+    if like.like == True:
+        like.like = False
+    else:
+        print(like.like)
+        like.like = True
+    like.save()
+    likeCount = LikePost.objects.filter(
+        post=likededPost, like=True)
+    print(likeCount)
+    return JsonResponse({'status': 201, "like_count": likeCount.count()}, status=201)
