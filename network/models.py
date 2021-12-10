@@ -46,24 +46,6 @@ class LikePost(models.Model):
         }
 
 
-class CommentPost(models.Model):
-    user = models.ForeignKey(
-        User, on_delete=models.CASCADE, related_name="CommentUser")
-    post = models.ForeignKey(
-        Post, on_delete=models.CASCADE, related_name="Postcommented")
-    comment = models.TextField(blank=True)
-    timestamp = models.DateTimeField(auto_now_add=True)
-
-    def serialize(self):
-        return {
-            "id": self.id,
-            "post": self.post,
-            "user": self.user,
-            "comment": self.comment,
-            "timestamp": self.timestamp.strftime("%b %d %Y, %I:%M %p")
-        }
-
-
 class FollowUser(models.Model):
     follower = models.ForeignKey(
         User, on_delete=models.CASCADE, related_name="UserFollower")

@@ -7,6 +7,7 @@ from django.http import JsonResponse, HttpResponse, HttpResponseRedirect
 from django.shortcuts import render
 from django.urls import reverse
 from django.core.paginator import Paginator
+from django.views.decorators.csrf import csrf_exempt
 
 from .models import *
 
@@ -16,8 +17,10 @@ def index(request):
         archived=False
     )
     posts = posts.order_by("-timestamp").all()
-    liked = LikePost.objects.filter(post__in=posts, like=True).exists()
-    print(liked)
+    if LikePost.objects.filter(post__in=posts, like=True).exists():
+        liked = LikePost.objects.filter(
+            post__in=posts, like=True)
+
     paginator = Paginator(posts, 10)
     page_number = request.GET.get('page')
     page_obj = paginator.get_page(page_number)
@@ -229,14 +232,57 @@ def like(request, postID):
 
     like = LikePost.objects.get(
         user=LikeUser, post=likededPost)
-    print(like.like)
     if like.like == True:
         like.like = False
     else:
-        print(like.like)
         like.like = True
     like.save()
+    liked = like.like
     likeCount = LikePost.objects.filter(
         post=likededPost, like=True)
-    print(likeCount)
-    return JsonResponse({'status': 201, "like_count": likeCount.count()}, status=201)
+    return JsonResponse({'status': 201, "like_count": likeCount.count(), "liked": liked}, status=201)
+
+
+def like_count(request, postID):
+    likededPost = Post.objects.get(id=postID)
+    LikeUser = User.objects.get(username=request.user)
+
+    liked = LikePost.objects.filter(
+        user=LikeUser, post=likededPost, like=True).exists()
+    likeCount = LikePost.objects.filter(
+        post=likededPost, like=True).count()
+    return JsonResponse({'status': 201, "like_count": likeCount, "liked": liked}, status=201)
+
+
+def like_count_notloggin(request, postID):
+    likededPost = Post.objects.get(id=postID)
+    likeCount = LikePost.objects.filter(
+        post=likededPost, like=True).count()
+    return JsonResponse({'status': 201, "like_count": likeCount}, status=201)
+
+
+@login_required
+def editPost(request, postID):
+    user = User.objects.get(username=request.user)
+    post = Post.objects.get(id=postID)
+    body = post.body
+    if not user == post.user:
+        return JsonResponse({'error': 'User is not user'})
+    return JsonResponse({'status': 201, "post": body}, status=201)
+
+
+@csrf_exempt
+@login_required
+def editPostInDB(request):
+    user = User.objects.get(username=request.user)
+    data = json.loads(request.body)
+    body = data.get("body", "")
+    postID = data.get("postid", "")
+    if not body:
+        return JsonResponse({"error": "Body of post is empty."}, status=400)
+    post = Post.objects.get(id=postID)
+    if user != post.user:
+        return JsonResponse({"error": "User request is not owner."}, status=400)
+    post.body = body
+    post.save()
+    return JsonResponse({'status': 201, "post": post}, status=201)
