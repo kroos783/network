@@ -1,2 +1,1 @@
-web: gunicorn manage:app --log-file=-
-heroku ps:scale web=1
+web: gunicorn project4.wsgi --log-file -
