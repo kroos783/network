@@ -1,0 +1,40 @@
+.html {
+  width: 100%;
+  min-height: 100%;
+}
+
+.body {
+  background-color: #333333;
+  color: aliceblue;
+}
+
+.boxPost {
+  margin-left: 35%;
+  margin-right: 35%;
+  margin-top: 20px;
+  margin-bottom: 20px;
+  border-radius: 10px;
+  box-shadow: 5px 5px 10px #202020, -5px -5px 10px #464646;
+}
+
+.boxForm {
+  margin-left: 37%;
+  margin-right: 37%;
+  margin-bottom: 25px;
+}
+
+.navbbox {
+  background-color: #333333;
+  box-shadow: 5px 5px 10px #202020, -5px -5px 10px #464646;
+}
+
+.bodyPagination {
+  display: flex;
+  justify-content: center;
+  padding: 5px;
+}
+
+.bodytotal {
+  background-color: #333333;
+  color: aliceblue;
+}

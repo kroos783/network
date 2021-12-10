@@ -1,9 +1,10 @@
 {% extends "network/layout.html" %} 
 {% load static %} 
 {% block body %} 
+<h3 style ="margin-left:37%; padding-top: 20px;">New Post</h3>
 {% if user.is_authenticated %}
-<div id="compose-view">
-  <h3>New Post</h3>
+<div class="boxForm" id="compose-view">
+  
   <form id="compose-form">
     {% csrf_token %}
     <div class="form-group">
@@ -20,12 +21,12 @@
       id="compose-body"
       placeholder="Body"
     ></textarea>
-    <input type="submit" class="btn btn-primary" />
+    <input type="submit" class="btn btn-primary mt-3" />
   </form>
 </div>
 {% else %}
-<div id="compose-view">
-  <h3>New Post</h3>
+<div class="boxForm" id="compose-view">
+  
   <form id="compose-form">
     {% csrf_token %}
     <div class="form-group">
@@ -43,38 +44,49 @@
       id="compose-body"
       placeholder="Body"
     ></textarea>
-    <input disabled type="submit" class="btn btn-primary" />
+    <input disabled type="submit" class="btn btn-primary mt-3" />
   </form>
-  <p>To send a post, you need to be <a href="{% url 'login' %}">log in</a> or <a href="{% url 'register' %}">create an account</a>.</p>
+  <p>To send or like a post, you need to be <a href="{% url 'login' %}">log in</a> or <a href="{% url 'register' %}">create an account</a>.</p>
 </div>
 {% endif %}
 
-
+<h3 style ="margin-left:35%; margin-top: 50px;">All posts :</h3>
 {% for post in posts %}
-<div id="posts_view">
+<div class="boxPost" id="posts_view">
   <div class="owner col-3"> From : <a href="{% url 'userPage' post.user %}"><strong>{{post.user}}</strong></a></div>
-  <div class="body col-5"> Message : <strong>{{post.body}}</strong></div>
+  <div id="postBody{{post.id}}" class="bodyPost col-5"> Message : <strong>{{post.body}}</strong></div>
 
   {% if request.user.is_authenticated %}
+    {% if request.user == post.user %}
+    <div id="buttonEdit{{post.id}}">
+      <button class="btn btn-sm btn-outline-primary m-1 ml-4" onclick="editFunction('{{post.id}}')">Edit</button>
+    </div>
+    {% endif %}
     <div id="likeunlike">
+      <button class="btn btn-sm btn-outline-primary m-3 ml-4" id="buttonLike{{post.id}}" onclick="likeFunction('{{post.id}}')"></button>
+      <i id="liked{{post.id}}"></i>
+      <script type="text/javascript">
         
-      
-        <button class="btn btn btn-primary m-3 ml-4" id="buttonLike{{post.id}}" onclick="likeFunction('{{post.id}}')">Like</button>
-        <i id="liked{{post.id}}">Like : 0</i>
-        
+        load_like(`{{post.id}}`)
+      </script>
     </div>
   {% else %}
     <div id="likeunlike">
-      <button disabled class="btn btn btn-primary m-3 ml-4" id="buttonLike" onclick="likeFunction('{{post.id}}')">Like</button>
+      <button disabled class="btn btn btn-outline-primary m-3 ml-4" id="buttonLike{{post.id}}" onclick="likeFunction('{{post.id}}')"></button>
+      <i id="liked{{post.id}}"></i>
+      <script type="text/javascript">
+        
+        load_like_nologgin(`{{post.id}}`)
+      </script>
     </div>
   {% endif %}
 
-
-  <div class="timestamp col-3">{{post.timestamp}}</div>
+  
+  <div class="timestamp ml-3 pb-1">{{post.timestamp}}</div>
 </div>
 {% endfor %}
 
-<div>
+<div class="bodyPagination">
   
   <nav aria-label="Page navigation example">
     <ul class="pagination step-links">
@@ -97,21 +109,21 @@
         </li>
         <li class="page-item disabled">
           <a class="page-link" href="#" aria-label="Previous">
-            <span aria-hidden="true">&laquo;</span>
+            <span aria-hidden="true">&laquo; Previous</span>
           </a>
         </li>
       {% endif %}
 
       
-      <span class="current">
-        Page {{ posts.number }} of {{ posts.paginator.num_pages }}.
+      <span class="current mr-4 mt-2 ml-4">
+        Page {{ posts.number }} of {{ posts.paginator.num_pages }}
       </span>
       
 
       {% if posts.has_next %}
       <li class="page-item">
         <a class="page-link" href="?page={{ posts.next_page_number }}" aria-label="Next">
-          <span aria-hidden="true">&raquo;</span>
+          <span aria-hidden="true">Next &raquo;</span>
         </a>
       </li>
       <li class="page-item">
@@ -139,6 +151,7 @@
 {% endblock %} {% block script %}
 <script src="{% static 'network/main.js' %}"></script>
 <script src="{% static 'network/like.js' %}"></script>
+<script src="{% static 'network/edit.js' %}"></script>
 <script
   src="http://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"
   type="text/javascript"

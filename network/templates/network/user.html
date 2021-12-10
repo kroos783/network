@@ -1,41 +1,69 @@
 {% extends "network/layout.html" %} 
 {% load static %} 
 {% block body %} 
-<h3>User : {{ user.username }}</h3>
-member since : {{ user.date_joined }}
+<h3 style ="margin-left:35%; padding-top: 25px;">User : </h3>
+<div class="boxPost" >
+<h3 class="ml-3">{{ user.username }}</h3>
 <div>
-<div id="follower">Follower : {{ follower }}</div>
-<div id="followed">Followed : {{ followed }}</div>
+<div class="ml-3" id="follower">Follower : {{ follower }}</div>
+<div class="ml-3" id="followed">Followed : {{ followed }}</div>
 </div>
 {% if request.user.is_authenticated and request.user.username != user.username %}
-<div id="followunfollow">
+<div class="ml-3 mt-1 mb-1" id="followunfollow">
     {% if follow.follow %}
-    <button class="btn btn btn-primary m-3 ml-4" id="buttonFollow" onclick="followFunction('{{user.username}}')">Unfollow</button>
+    <button class="btn btn btn-primary" id="buttonFollow" onclick="followFunction('{{user.username}}')">Unfollow</button>
     {% else %}
-    <button class="btn btn btn-primary m-3 ml-4" id="buttonFollow" onclick="followFunction('{{user.username}}')">Follow</button>
+    <button class="btn btn btn-primary" id="buttonFollow" onclick="followFunction('{{user.username}}')">Follow</button>
     {% endif %}
 </div>
 {% else %}
-<div id="followunfollow">
-    <button disabled class="btn btn btn-primary m-3 ml-4" id="buttonFollow" onclick="followFunction('{{user.username}}')">Follow</button>
+<div class="ml-3 mt-1 mb-1" id="followunfollow">
+    <button disabled class="btn btn btn-primary" id="buttonFollow" onclick="followFunction('{{user.username}}')">Follow</button>
 </div>
 {% if not request.user.is_authenticated %}
-<p>To follow a user, you need to be <a href="{% url 'login' %}">log in</a> or <a href="{% url 'register' %}">create an account</a>.</p>
+<p class="ml-3">To follow a user, you need to be <a href="{% url 'login' %}">log in</a> or <a href="{% url 'register' %}">create an account</a>.</p>
 {% endif %}
 {% endif %}
+<div class="ml-3 pb-1">Member since : {{ user.date_joined }}</div>
+</div>
 
-
+<h3 style ="margin-left:35%; margin-top: 50px;">User posts :</h3>
 {% for post in posts %}
-<div id="posts_view">
-  <div class="owner"> From : <a href="{% url 'userPage' post.user %}"><strong>{{post.user}}</strong></a></div>
-  <div class="body"> Message : <strong>{{post.body}}</strong></div>
-  <img src="https://img.icons8.com/external-icongeek26-linear-colour-icongeek26/25/000000/external-like-donation-and-charity-icongeek26-linear-colour-icongeek26.png"/>
-  <img src="https://img.icons8.com/external-icongeek26-outline-gradient-icongeek26/25/000000/external-like-donation-and-charity-icongeek26-outline-gradient-icongeek26.png"/>
-  <div class="timestamp">{{post.timestamp}}</div>
+<div class="boxPost" id="posts_view">
+  <div class="owner ml-3"> From : <a href="{% url 'userPage' post.user %}"><strong>{{post.user}}</strong></a></div>
+  <div id="postBody{{post.id}}" class="body ml-3"> Message : <strong>{{post.body}}</strong></div>
+
+  {% if request.user.is_authenticated %}
+    {% if request.user == post.user %}
+    <div id="buttonEdit{{post.id}}">
+      <button class="btn btn-sm btn-outline-primary m-3 ml-4" onclick="editFunction('{{post.id}}')">Edit</button>
+    </div>
+    {% endif %}
+    <div id="likeunlike">
+      <button class="btn btn-sm btn-outline-primary m-3 ml-4" id="buttonLike{{post.id}}" onclick="likeFunction('{{post.id}}')"></button>
+      <i id="liked{{post.id}}"></i>
+      <script type="text/javascript">
+        
+        load_like(`{{post.id}}`)
+      </script>
+    </div>
+  {% else %}
+    <div id="likeunlike">
+      <button disabled class="btn btn btn-outline-primary m-3 ml-4" id="buttonLike{{post.id}}" onclick="likeFunction('{{post.id}}')"></button>
+      <i id="liked{{post.id}}"></i>
+      <script type="text/javascript">
+        
+        load_like_nologgin(`{{post.id}}`)
+      </script>
+    </div>
+  {% endif %}
+
+  
+  <div class="timestamp ml-3 pb-1">{{post.timestamp}}</div>
 </div>
 {% endfor %}
 
-<div>
+<div style="display: flex; justify-content: center; margin:5px;">
 
   <nav aria-label="Page navigation example">
     <ul class="pagination step-links">
@@ -64,7 +92,7 @@ member since : {{ user.date_joined }}
       {% endif %}
 
       
-      <span class="current">
+      <span class="current mr-4 mt-2 ml-4">
         Page {{ posts.number }} of {{ posts.paginator.num_pages }}.
       </span>
       
@@ -101,6 +129,8 @@ member since : {{ user.date_joined }}
 
 {% endblock %} {% block script %}
 <script src="{% static 'network/user.js' %}"></script>
+<script src="{% static 'network/like.js' %}"></script>
+<script src="{% static 'network/edit.js' %}"></script>
 <script
   src="http://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"
   type="text/javascript"
