@@ -16,8 +16,8 @@ function editFunction(id) {
           id="compose-body${id}"
           placeholder="Body"
         >${post.post}</textarea>
-        <button class="btn btn-sm btn-primary m-3 ml-4" onclick="editSubmit('${id}')">Submit</button>
-        <button class="btn btn-sm btn-primary m-3 ml-4" onclick="cancelFunction('${id}')">Cancel</button>
+        <button class="btn btn-sm btn-primary m-3 ml-4" onclick="editSubmit(${id})">Submit</button>
+        <button class="btn btn-sm btn-primary m-3 ml-4" onclick="cancelFunction(${id})">Cancel</button>
         </form>`
 
     })
@@ -26,7 +26,7 @@ function editFunction(id) {
 function cancelFunction(id) {
     let ButtonEdit = document.querySelector(`#buttonEdit${id}`);
     let PostEdit = document.querySelector(`#postBody${id}`);
-    ButtonEdit.innerHTML = `<button class="btn btn-sm btn-primary m-3 ml-4" onclick="editFunction('${id}')">Edit</button>`;
+    ButtonEdit.innerHTML = `<button class="btn btn-sm btn-primary m-3 ml-4" onclick="editFunction(${id})">Edit</button>`;
     
     fetch('/edit/' + id)
     .then(response => response.json())
